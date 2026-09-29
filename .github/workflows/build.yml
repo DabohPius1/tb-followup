@@ -12,12 +12,23 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - run: |
+      - name: Install system packages
+        run: |
           sudo apt-get update
-          sudo apt-get install -y autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev unzip zip
-          pip install buildozer "cython<3" setuptools
-          yes | buildozer -v android debug
-      - uses: actions/upload-artifact@v4
+          sudo apt-get install -y git zip unzip autoconf automake libtool libltdl-dev pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev
+      - name: Install buildozer
+        run: pip install buildozer "cython<3" setuptools
+      - name: Build APK
+        shell: bash
+        run: buildozer -v android debug 2>&1 | tee build.log
+      - name: Upload log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
           name: tb-followup-apk
           path: bin/*.apk
