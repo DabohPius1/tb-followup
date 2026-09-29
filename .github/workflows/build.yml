@@ -20,7 +20,9 @@ jobs:
         run: pip install buildozer "cython<3" setuptools
       - name: Build APK
         shell: bash
-        run: buildozer -v android debug 2>&1 | tee build.log
+        run: yes | buildozer -v android debug 2>&1 | tee build.log
+        env:
+          BUILDOZER_WARN_ON_ROOT: 0
       - name: Upload log
         if: always()
         uses: actions/upload-artifact@v4
